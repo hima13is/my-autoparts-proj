@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+.next
+.medusa
+.turbo
+coverage
+playwright-report
+test-results
+docs/PLAN.md
+apps/backend/src/migration-scripts

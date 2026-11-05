@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Builds
+.next/
+out/
+dist/
+build/
+.medusa/
+.turbo/
+*.tsbuildinfo
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Env files: never commit real secrets. Templates (.env.example/.env.template) are fine.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Tools / OS
+.vercel
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.pem
+npm-debug.log*
+pnpm-debug.log*
+
+# Claude Code local settings
+.claude/settings.local.json
