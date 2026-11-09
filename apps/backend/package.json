@@ -13,6 +13,7 @@
   "scripts": {
     "build": "medusa build",
     "start": "medusa start",
+    "start:prod": "cd .medusa/server && medusa start",
     "dev": "medusa develop",
     "lint": "medusa lint",
     "typecheck": "tsc --noEmit",
@@ -32,6 +33,7 @@
     "@medusajs/framework": "2.22.3",
     "@medusajs/medusa": "2.22.3",
     "@medusajs/ui": "4.2.10",
+    "@sentry/node": "11.8.0",
     "@tanstack/react-query": "5.64.2",
     "react-i18next": "13.5.0",
     "react-router-dom": "7.18.2",
