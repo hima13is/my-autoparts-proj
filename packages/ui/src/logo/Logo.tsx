@@ -19,7 +19,8 @@ export function Logo({ tone = "light", className, title = "fitgaadi" }: LogoProp
   return (
     <svg
       viewBox={wordmark.viewBox}
-      className={cn("h-7 w-auto", className)}
+      // Default height only when the caller passes none (two h-* classes would fight).
+      className={cn("w-auto shrink-0", className ?? "h-7")}
       role={title ? "img" : undefined}
       aria-label={title || undefined}
       aria-hidden={title ? undefined : true}
@@ -51,7 +52,7 @@ export function LogoMark({ className, title }: { className?: string; title?: str
   return (
     <svg
       viewBox="0 0 512 512"
-      className={cn("size-8", className)}
+      className={cn("shrink-0", className ?? "size-8")}
       role={title ? "img" : undefined}
       aria-label={title}
       aria-hidden={title ? undefined : true}

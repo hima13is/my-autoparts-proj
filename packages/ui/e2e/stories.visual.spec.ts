@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs"
 import path from "node:path"
+import { fileURLToPath } from "node:url"
 import { expect, test } from "@playwright/test"
 
 // One screenshot per Storybook story, taken from the built Storybook's own index,
@@ -12,7 +13,10 @@ interface IndexEntry {
 }
 
 const index = JSON.parse(
-  readFileSync(path.join(__dirname, "../storybook-static/index.json"), "utf8")
+  readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), "../storybook-static/index.json"),
+    "utf8"
+  )
 ) as { entries: Record<string, IndexEntry> }
 
 const stories = Object.values(index.entries).filter((e) => e.type === "story")

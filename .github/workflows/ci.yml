@@ -121,6 +121,81 @@ jobs:
             backend.log
           retention-days: 7
 
+  # 6. Design system: every Storybook story rendered in Chromium; any axe violation fails.
+  design-system:
+    name: Design system (Storybook + axe)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        working-directory: packages/ui
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm --filter @autoparts/ui test:storybook
+
+  # 7. Visual regression: screenshots of every story and of the prototype at 5 widths,
+  #    inside the same Docker image used to create the baselines (scripts/visual-baselines.sh).
+  visual:
+    name: Visual regression
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --user 1001
+    env:
+      CI: "1"
+      HOME: /tmp
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - run: pnpm install --frozen-lockfile --filter "@autoparts/storefront..." --filter "@autoparts/ui..."
+      - run: pnpm --filter @autoparts/storefront build
+      - run: pnpm --filter @autoparts/ui build:storybook
+      - name: Prototype pages at 360–1440px
+        working-directory: apps/storefront
+        run: VISUAL=1 pnpm exec playwright test
+      - name: Every Storybook story
+        if: success() || failure()
+        working-directory: packages/ui
+        run: pnpm exec playwright test
+      - name: Upload screenshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-diffs
+          path: |
+            apps/storefront/test-results
+            packages/ui/test-results
+          retention-days: 7
+
+  # 8. Lighthouse on the prototype pages: accessibility must score >= 95.
+  lighthouse:
+    name: Lighthouse (accessibility ≥ 95)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@autoparts/storefront..."
+      - run: pnpm --filter @autoparts/storefront build
+      - name: Run Lighthouse CI
+        working-directory: apps/storefront
+        run: npx --yes @lhci/cli@0.15.1 autorun
+      - name: Upload Lighthouse reports
+        if: success() || failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse
+          path: apps/storefront/.lighthouseci
+          retention-days: 14
+
   # 4. Fail if any secret/API key is committed.
   secrets:
     name: Secret scan (gitleaks)

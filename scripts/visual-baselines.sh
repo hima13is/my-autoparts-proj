@@ -26,7 +26,7 @@ MSYS_NO_PATHCONV=1 docker run --rm -e UPDATE="$UPDATE" -v "$ROOT:/src" -w /work 
   (cd packages/ui && CI=1 pnpm exec playwright test $UPDATE) || status=$?
   if [ -n "$UPDATE" ]; then
     for d in apps/storefront/e2e/__screenshots__ packages/ui/e2e/__screenshots__; do
-      rm -rf "/src/$d" && cp -r "$d" "/src/$d"
+      if [ -d "$d" ]; then rm -rf "/src/$d" && cp -r "$d" "/src/$d"; fi
     done
     echo "Baselines written. Review them, then commit."
   fi

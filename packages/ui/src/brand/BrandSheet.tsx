@@ -33,7 +33,7 @@ export function BrandSheet() {
     <article className="mx-auto flex max-w-5xl flex-col gap-10 bg-cream p-8 text-charcoal">
       <header className="flex flex-col gap-6 rounded-card bg-ink p-8 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-3">
-          <Logo tone="dark" className="h-14" />
+          <Logo tone="dark" className="h-14 self-start" />
           <p className="font-heading text-2xl font-semibold text-cream">Sahi fit. Seedha ghar.</p>
           <p className="max-w-md text-cream">
             Car &amp; SUV accessories for India, matched to your exact car. Warm, confident,
