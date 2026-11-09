@@ -194,6 +194,7 @@ jobs:
         with:
           name: lighthouse
           path: apps/storefront/.lighthouseci
+          include-hidden-files: true
           retention-days: 14
 
   # 4. Fail if any secret/API key is committed.
