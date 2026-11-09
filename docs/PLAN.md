@@ -1,6 +1,6 @@
 # my-autoparts-proj: Product & Technical Plan (v0.1, draft for review)
 
-> Status: **APPROVED on 5 Nov 2026. Build Phase 0 in progress.**
+> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 built 9 Nov 2026, waiting for owner sign-off (PR #14). Next: Build Phase 2.
 > Date: 5 Nov 2026 · Author: Claude (architect/designer) · Reviewer: project owner
 
 ## Decisions log
@@ -13,6 +13,11 @@
 | 5 Nov 2026 | **Photos: suppliers will shoot and send** | Shared guide: [`supplier-photo-guide.md`](supplier-photo-guide.md). Photo permission is part of supplier onboarding. |
 | 5 Nov 2026 | **Backend: Medusa** | Uses Medusa **2.22** via the maintained `dtc-starter` (the older default starter is deprecated). See [`adr/0001-tech-stack.md`](adr/0001-tech-stack.md). |
 | 5 Nov 2026 | Money storage | Medusa stores prices in rupees as exact decimals (not integers in paise). The rule is now "no floating-point maths on money". |
+| 9 Nov 2026 | **GitHub repo is public** | On the free GitHub plan, enforced branch protection and unlimited CI minutes need a public repo. No secrets are committed (gitleaks checks every PR). |
+| 9 Nov 2026 | **Staging hosting** | Backend + Postgres on Railway in **Singapore** (closest region to India). Storefront on Vercel with functions in Singapore (`sin1`). Redis and Meilisearch are added when Phase 2 first needs them. No custom domain yet, so Cloudflare DNS waits. Railway Config as Code (`railway.json`) must move to `.railway/railway.ts` before 1 Dec 2026. |
+| 9 Nov 2026 | **Sentry: errors only, no customer data** | Sentry 11.8 in both apps. All of Sentry's default data collection (user info, cookies, headers, bodies, SQL, stack variables) is switched off. No performance tracing yet. Source-map upload is planned for Phase 5. |
+| 9 Nov 2026 | **PR merge policy** | The owner signs off phase PRs. Claude may merge maintenance PRs (Dependabot, small CI fixes) once CI is green, skipping versions released less than 2 weeks ago. React majors are ignored for the backend (Medusa admin needs React 18). |
+| 9 Nov 2026 | **Design system** | `packages/ui` on native HTML elements (no component library). Storybook 10 stories double as accessibility tests, and screenshot baselines are made in the Playwright Linux Docker image. See [`adr/0003-design-system.md`](adr/0003-design-system.md). |
 
 ---
 
@@ -805,6 +810,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 **Exit criteria:** CI green on `main`; staging live; local setup works from the README on your machine; no secrets in the repo (gitleaks clean). Tag `v0.1.0`.
 
+> **Status: ✅ signed off 9 Nov 2026, tagged `v0.1.0`.** Report: [`test-plans/phase-0.md`](test-plans/phase-0.md).
+
 ---
 
 ### Build Phase 1: Brand & design system · ≈ 1 week
@@ -833,6 +840,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 4. Turn your phone to landscape and use the largest font size in phone settings → nothing should overlap or be cut off.
 
 **Exit criteria:** you approve the visual style; 0 axe violations; visual snapshots baselined; Lighthouse accessibility ≥ 95 on prototype pages. Tag `v0.2.0`.
+
+> **Status: built 9 Nov 2026, waiting for owner sign-off** ([PR #14](https://github.com/hima13is/my-autoparts-proj/pull/14)). All automated exit criteria are met: 0 axe violations (49 stories, 4 pages), 70 screenshot baselines, Lighthouse accessibility 98–100. Report: [`test-plans/phase-1.md`](test-plans/phase-1.md).
 
 ---
 
