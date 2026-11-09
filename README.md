@@ -14,6 +14,8 @@ Shoppers pick their car once and only see accessories that fit it. Products are 
 | Shared code (types, INR formatting)                    | TypeScript              | `packages/shared`          | n/a                                                      |
 | Local services (Postgres, Redis, Meilisearch, Mailpit) | Docker                  | `infra/docker-compose.yml` | Mailpit inbox: http://localhost:8025                     |
 
+**Staging:** storefront https://fitgaadi-storefront.vercel.app (Vercel) · backend + admin https://backend-production-1770.up.railway.app/app (Railway, Singapore) · errors in Sentry (`storefront`, `backend`). Env var names are listed in `.env.example`; values live in Vercel/Railway only.
+
 ## One-time setup (Windows)
 
 You need: **Node.js ≥ 22.23** (you have 24 ✅), **Git** ✅, **pnpm**, **Docker Desktop**, optionally **GitHub CLI**.
@@ -48,15 +50,15 @@ pnpm dev           # starts storefront (3000) and backend + admin (9000) togethe
 
 ## Checks (the same ones CI runs on every pull request)
 
-| Command                 | What it checks                                                                                                                                                                               |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm lint`             | Code style & common mistakes                                                                                                                                                                 |
-| `pnpm typecheck`        | TypeScript types                                                                                                                                                                             |
-| `pnpm test`             | Unit tests (all packages)                                                                                                                                                                    |
-| `pnpm test:integration` | Backend API tests against a real Postgres (needs `pnpm services:up`)                                                                                                                         |
-| `pnpm build`            | Production builds                                                                                                                                                                            |
-| `pnpm test:e2e`         | Browser tests on Pixel 7, iPhone 14 and desktop Chrome, incl. accessibility scan. Run `pnpm build` first; first time also `cd apps/storefront; pnpm exec playwright install chromium webkit` |
-| `pnpm format`           | Auto-format all files                                                                                                                                                                        |
+| Command                 | What it checks                                                                                                                                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm lint`             | Code style & common mistakes                                                                                                                                                                                                                     |
+| `pnpm typecheck`        | TypeScript types                                                                                                                                                                                                                                 |
+| `pnpm test`             | Unit tests (all packages)                                                                                                                                                                                                                        |
+| `pnpm test:integration` | Backend API tests against a real Postgres (needs `pnpm services:up`)                                                                                                                                                                             |
+| `pnpm build`            | Production builds                                                                                                                                                                                                                                |
+| `pnpm test:e2e`         | Browser tests on Pixel 7, iPhone 14 and desktop Chrome, incl. accessibility scan. Run `pnpm build` first; first time also `cd apps/storefront; pnpm exec playwright install chromium webkit`. If `pnpm dev` holds port 3000, set `E2E_PORT=3200` |
+| `pnpm format`           | Auto-format all files                                                                                                                                                                                                                            |
 
 ## Conventions
 
