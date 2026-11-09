@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "../src/styles/theme.css";
+/* Self-hosted fonts (deterministic for screenshot tests; no network). */
+@import "@fontsource-variable/bricolage-grotesque/wght.css";
+@import "@fontsource/noto-sans/400.css";
+@import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/600.css";
+@import "@fontsource/noto-sans/700.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+@source "../src";
+
+:root {
+  --font-bricolage: "Bricolage Grotesque Variable";
+  --font-noto: "Noto Sans";
+  --font-plex-mono: "IBM Plex Mono";
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-body);
+}

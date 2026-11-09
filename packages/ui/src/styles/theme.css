@@ -1,0 +1,64 @@
+/*
+ * FitGaadi design tokens + base styles for Tailwind 4.
+ * Import after `@import "tailwindcss";` in the app's CSS.
+ * Colour values must match src/tokens.ts (checked by tokens.test.ts).
+ */
+@theme {
+  --color-ink: #0e3b43;
+  --color-teal-600: #1d6672;
+  --color-marigold: #f2a93b;
+  --color-marigold-600: #e0922a;
+  --color-fit: #157a41;
+  --color-amber-ink: #8a5a00;
+  --color-brick: #b42318;
+  --color-cream: #faf7f2;
+  --color-white: #ffffff;
+  --color-sand: #e5e0d8;
+  --color-stone: #8c8478;
+  --color-charcoal: #1a1a1a;
+  --color-graphite: #5c5c5c;
+
+  /* Apps set these three variables (next/font in the storefront, @fontsource in Storybook). */
+  --font-heading: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-noto), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(14 59 67 / 0.06), 0 2px 8px rgb(14 59 67 / 0.06);
+  --shadow-sheet: 0 -8px 32px rgb(14 59 67 / 0.18);
+
+  /* Minimum touch target (WCAG 2.5.5 AAA / Android & iOS guidance). */
+  --spacing-tap: 2.75rem;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Always-visible keyboard focus. Dark surfaces switch to Marigold (6:1 on Ink). */
+  :focus-visible {
+    outline: 3px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-marigold);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
