@@ -5,6 +5,11 @@ import nextTs from "eslint-config-next/typescript"
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    // Prototype images are inline SVG data: URIs; next/image can't optimise those.
+    files: ["src/prototype/**", "src/app/prototype/**"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

@@ -1,5 +1,7 @@
+import Link from "next/link"
 import { Suspense } from "react"
 import { formatINR } from "@autoparts/shared"
+import { buttonClasses } from "@autoparts/ui"
 import { BackendStatusBadge, BackendStatusFallback } from "@/components/backend-status"
 
 export default function Home() {
@@ -16,6 +18,10 @@ export default function Home() {
       <p className="max-w-prose text-lg">
         Car &amp; SUV accessories that actually fit your car. <em>Sahi fit. Seedha ghar.</em>
       </p>
+
+      <Link href="/prototype" className={buttonClasses({ size: "lg", className: "self-start" })}>
+        Open the Phase 1 prototype
+      </Link>
 
       <Suspense fallback={<BackendStatusFallback />}>
         <BackendStatusBadge />

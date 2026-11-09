@@ -1,8 +1,8 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  // Shared workspace package ships TypeScript source; let Next compile it.
-  transpilePackages: ["@autoparts/shared"],
+  // Workspace packages ship TypeScript source; let Next compile them.
+  transpilePackages: ["@autoparts/shared", "@autoparts/ui"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
