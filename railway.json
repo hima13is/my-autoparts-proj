@@ -6,7 +6,6 @@
     "watchPatterns": ["apps/backend/**", "packages/shared/**", "pnpm-lock.yaml"]
   },
   "deploy": {
-    "preDeployCommand": ["pnpm --filter @autoparts/backend db:migrate"],
     "startCommand": "pnpm --filter @autoparts/backend start:prod",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,

@@ -13,7 +13,7 @@
   "scripts": {
     "build": "medusa build",
     "start": "medusa start",
-    "start:prod": "cd .medusa/server && medusa start",
+    "start:prod": "cd .medusa/server && medusa db:migrate && medusa start",
     "dev": "medusa develop",
     "lint": "medusa lint",
     "typecheck": "tsc --noEmit",
