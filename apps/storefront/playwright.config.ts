@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test"
+import { E2E_SENTRY_CHECK_TOKEN } from "./e2e/constants"
 
-const PORT = 3000
+// E2E_PORT lets tests run while `pnpm dev` is using 3000 (otherwise Playwright reuses the dev server).
+const PORT = Number(process.env.E2E_PORT ?? 3000)
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
 
 export default defineConfig({
@@ -19,9 +21,11 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: "pnpm start",
+        command: `pnpm exec next start --port ${PORT}`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        // Enables /api/sentry-check for the e2e test. No DSN is set, so nothing is sent to Sentry.
+        env: { SENTRY_CHECK_TOKEN: E2E_SENTRY_CHECK_TOKEN },
       },
 })

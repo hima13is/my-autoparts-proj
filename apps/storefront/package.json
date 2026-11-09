@@ -12,12 +12,15 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@autoparts/shared": "workspace:*",
+    "@sentry/nextjs": "11.8.0",
     "next": "16.4.5",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "@autoparts/shared": "workspace:*"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -26,8 +29,6 @@
     "eslint-config-next": "16.4.5",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "@playwright/test": "^1.56.1",
-    "@axe-core/playwright": "^4.11.0",
     "vitest": "^3.2.4"
   }
 }
