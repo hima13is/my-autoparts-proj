@@ -20,15 +20,16 @@
 
 ## Automated results (9 Nov 2026)
 
-| Check                                   | Result                                                                                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Unit tests (`pnpm test`)                | ✅ 83 passed (ui 60 · shared 7 · storefront 7 · backend 9)                                                                                                               |
-| Colour contrast                         | ✅ every text pairing used ≥ 4.5:1, every control outline/focus ring ≥ 3:1 (unit-tested from `tokens.ts`)                                                                |
-| Storybook stories as tests, axe = error | ✅ 49/49 in Chromium, 0 violations; includes interaction tests (Esc closes the sheet and returns focus, arrow keys in tabs, toast announced, full vehicle-selector flow) |
-| E2E (Pixel 7, iPhone 14, desktop)       | ✅ 47 passed, 7 skipped by design. Axe on all 4 prototype pages, car-fit journey, selector sheet with search, cart, PIN validation, keyboard-only walk, 44px tap targets |
-| Visual regression                       | ✅ 70 baselines (49 stories + 4 pages × 5 widths: 360/390/768/1024/1440), re-checked identical in a fresh Linux container                                                |
-| Lighthouse accessibility ≥ 95           | Runs in CI on every PR (job "Lighthouse")                                                                                                                                |
-| Lint · typecheck · build                | ✅ 0 problems                                                                                                                                                            |
+| Check                                   | Result                                                                                                                                                                                         |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit tests (`pnpm test`)                | ✅ 83 passed (ui 60 · shared 7 · storefront 7 · backend 9)                                                                                                                                     |
+| Colour contrast                         | ✅ every text pairing used ≥ 4.5:1, every control outline/focus ring ≥ 3:1 (unit-tested from `tokens.ts`)                                                                                      |
+| Storybook stories as tests, axe = error | ✅ 49/49 in Chromium, 0 violations; includes interaction tests (Esc closes the sheet and returns focus, arrow keys in tabs, toast announced, full vehicle-selector flow)                       |
+| E2E (Pixel 7, iPhone 14, desktop)       | ✅ 47 passed, 7 skipped by design. Axe on all 4 prototype pages, car-fit journey, selector sheet with search, cart, PIN validation, keyboard-only walk, 44px tap targets                       |
+| Visual regression                       | ✅ 70 baselines (49 stories + 4 pages × 5 widths: 360/390/768/1024/1440), re-checked identical in a fresh Linux container                                                                      |
+| Lighthouse (CI, throttled phone)        | ✅ accessibility 100 / 98 / 100 / 100 (home / category / product / cart). Performance 73 / 85 / 84 / 92, a warning only (target 80); home is slowest (780 ms blocking time), to fix in Phase 5 |
+| CI on PR #14                            | ✅ all 8 jobs green (5 existing + design system, visual regression, Lighthouse; all now required on `main`)                                                                                    |
+| Lint · typecheck · build                | ✅ 0 problems                                                                                                                                                                                  |
 
 **Bugs found by the tests and fixed:**
 
@@ -70,4 +71,5 @@
 - Demo brands, products, prices and ratings are made up and appear only under `/prototype`.
 - The prototype cart and car choice are saved in the browser only. Real carts and accounts arrive in Phases 2–3.
 - Updating screenshot baselines after an intended visual change: `bash scripts/visual-baselines.sh` (needs Docker), review the PNGs, commit.
+- Performance: the prototype home page scores 73 on Lighthouse's throttled phone test (blocking time 780 ms). Phase 5 (launch hardening) covers this.
 - Still open from Phase 0: migrate Railway's `railway.json` to `.railway/railway.ts` before 1 Dec 2026.
