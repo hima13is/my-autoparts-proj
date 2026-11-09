@@ -1,0 +1,32 @@
+{
+  "name": "my-autoparts-proj",
+  "private": true,
+  "description": "FitGaadi: car & SUV accessories store for India (Next.js storefront + Medusa backend).",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:all": "pnpm services:up && turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:integration": "pnpm --filter @autoparts/backend test:integration:http",
+    "test:e2e": "pnpm --filter @autoparts/storefront test:e2e",
+    "services:up": "docker compose -f infra/docker-compose.yml up -d",
+    "services:down": "docker compose -f infra/docker-compose.yml down",
+    "db:migrate": "pnpm --filter @autoparts/backend db:migrate",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8"
+  }
+}

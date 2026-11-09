@@ -1,0 +1,12 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "!apps/backend/.medusa/**"
+
+# Packages allowed to run install scripts (pnpm blocks all others by default).
+onlyBuiltDependencies:
+  - "@medusajs/telemetry"
+  - "@swc/core"
+  - esbuild
+  - sharp
+  - unrs-resolver
