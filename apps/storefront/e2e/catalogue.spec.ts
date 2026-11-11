@@ -85,7 +85,7 @@ test.describe("Category pages", () => {
     // Streamed pages send their status before notFound() runs, so Next shows the
     // not-found page with a noindex tag instead of a 404 status.
     await page.goto("/c/no-such-thing")
-    await expect(page.getByText(/could not be found/i)).toBeVisible()
+    await expect(page.getByRole("heading", { name: "We couldn't find that page" })).toBeVisible()
     await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached()
   })
 })
@@ -117,7 +117,7 @@ test.describe("Car pages", () => {
     // Streamed pages send their status before notFound() runs, so Next shows the
     // not-found page with a noindex tag instead of a 404 status.
     await page.goto("/cars/hyundai/no-such-model")
-    await expect(page.getByText(/could not be found/i)).toBeVisible()
+    await expect(page.getByRole("heading", { name: "We couldn't find that page" })).toBeVisible()
     await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached()
   })
 })
