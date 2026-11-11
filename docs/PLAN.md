@@ -1,6 +1,6 @@
 # my-autoparts-proj: Product & Technical Plan (v0.1, draft for review)
 
-> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 in progress.
+> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 in progress (tasks 1–5 of 7 done, 11 Nov 2026).
 > Date: 5 Nov 2026 · Author: Claude (architect/designer) · Reviewer: project owner
 
 ## Decisions log
@@ -880,6 +880,24 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 6. Google "rich results test", paste one product URL → it shows Product with price and rating.
 
 **Exit criteria:** all tests green; 3-click journey proven by E2E; performance budgets met; you've tried it with your own car. Tag `v0.3.0`.
+
+> **Status (11 Nov 2026): in progress, [draft PR #16](https://github.com/hima13is/my-autoparts-proj/pull/16).**
+> - ✅ **1. Vehicle & fitment module:** make → model → generation → variant; fitment for a generation, one variant, or universal. Store and admin APIs, plus fitment workflows that emit `fitment.changed`.
+> - ✅ **2. Seed data:**
+>   - the launch car list (7 makes, 34 models, 50 generations, 156 variants) is loaded by a migration script on every environment
+>   - 121 demo products are loaded by a guarded script, on local/staging only
+>   - the owner should review `apps/backend/src/data/vehicles.ts`
+> - ✅ **3. Categories, brands, images:** a brand module; categories under Interior / Exterior & Care / Electronics; images on local storage with placeholders until Phase 5 (R2).
+> - ✅ **4. Storefront:**
+>   - vehicle selector and My Garage (on the device, mirrored to a cookie for server rendering)
+>   - home, `/c/[handle]`, `/cars/[make]/[model]`, `/p/[handle]` (fit verdict, "check another car", the cars it fits)
+>   - a branded 404; the Phase 0 page moved to `/status`
+> - ✅ **5. Search:** Medusa's search module on Postgres instead of Meilisearch ([ADR 0004](adr/0004-search-postgres.md)). It handles typos and synonyms ("seet cvr", "dascam"), the fits-my-car filter, `/search`, and instant suggestions in the header.
+> - ⏳ **6. PIN-code delivery estimate:** next, behind a mock until Shiprocket credentials exist.
+> - ⏳ **7. SEO basics:** page titles, descriptions and canonicals are done. Still to do: JSON-LD, sitemap, robots.txt.
+> - ⏳ **Still to do:** `test-plans/phase-2.md`, the performance check (Lighthouse ≥ 90 on Home/PLP/PDP), and staging (publishable key on Vercel, demo data on Railway), each with the owner's go-ahead.
+>
+> **Tests so far:** 75 backend unit tests, 41 backend integration tests (including the 20-product fit fixture), 24 storefront unit tests, 98 E2E tests on Pixel 7 / iPhone 14 / desktop with axe, and 55 Storybook stories with axe.
 
 ---
 
