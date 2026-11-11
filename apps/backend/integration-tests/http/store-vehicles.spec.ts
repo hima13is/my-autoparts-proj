@@ -130,6 +130,21 @@ medusaIntegrationTestRunner({
         )
         expect((await get("/store/vehicles/resolve?make=hyundai")).status).toBe(400)
       })
+
+      it("serves the whole tree for the selector, with the generation for each year", async () => {
+        const res = await get("/store/vehicles/catalog")
+        expect(res.status).toBe(200)
+        const hyundai = res.data.makes.find((m: { slug: string }) => m.slug === "hyundai")
+        const creta = hyundai.models.find((m: { slug: string }) => m.slug === "creta")
+        const y2021 = creta.years.find((y: { year: number }) => y.year === 2021)
+        expect(y2021.generationId).toBe(ids.gen2)
+        expect(y2021.variants.map((v: { name: string }) => v.name)).toEqual(["E", "SX", "SX(O)"])
+        expect(creta.years.find((y: { year: number }) => y.year === 2017).generationId).toBe(
+          ids.gen1
+        )
+        // A model with no generations has no years (the selector simply shows none).
+        expect(hyundai.models.find((m: { slug: string }) => m.slug === "venue").years).toEqual([])
+      })
     })
   },
 })
