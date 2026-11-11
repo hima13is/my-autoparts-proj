@@ -6,10 +6,11 @@ import { expect, test, type Page } from "@playwright/test"
 const results = (page: Page) => page.getByRole("list", { name: /Search results for/ })
 
 async function searchFor(page: Page, q: string) {
-  const box = page.getByRole("banner").getByRole("searchbox")
+  const box = page.getByRole("banner").getByRole("combobox", { name: "Search accessories" })
   await box.fill(q)
   await box.press("Enter")
-  await expect(page).toHaveURL(/\/search\?q=/)
+  // Wait for this exact query (the previous search's URL also starts with /search?q=).
+  await page.waitForURL((url) => url.pathname === "/search" && url.searchParams.get("q") === q)
 }
 
 test.describe("Search", () => {
@@ -71,5 +72,20 @@ test.describe("Search", () => {
     await expect(
       page.getByRole("main").getByRole("link", { name: "Seat Covers", exact: true })
     ).toBeVisible()
+  })
+
+  test("suggestions appear as you type and work with the keyboard", async ({ page }) => {
+    await page.goto("/")
+    const box = page.getByRole("banner").getByRole("combobox", { name: "Search accessories" })
+    await box.pressSequentially("dascam", { delay: 30 })
+    const list = page.getByRole("listbox", { name: "Search suggestions" })
+    await expect(list.getByRole("option", { name: /Dashcam/ }).first()).toBeVisible()
+    await expect(list.getByRole("option", { name: /See all results for “dascam”/ })).toBeVisible()
+
+    await box.press("ArrowDown")
+    await expect(list.getByRole("option").first()).toHaveAttribute("aria-selected", "true")
+    await box.press("Enter")
+    await expect(page).toHaveURL(/\/p\/.*dashcam/)
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/dashcam/i)
   })
 })

@@ -25,6 +25,7 @@ import {
 import { CAR_COOKIE, encodeCarCookie, writeCarCookie } from "@/lib/car-cookie"
 import { clearCurrent, pruneGarage, selectCar, withGeneration, type GarageCar } from "@/lib/garage"
 import { updateGarage, useGarage } from "@/lib/garage-store"
+import { SiteSearch } from "./site-search"
 
 interface CarApi {
   catalog: VehicleCatalog
@@ -104,6 +105,7 @@ export function SiteShell({ catalog, children }: { catalog: VehicleCatalog; chil
           accountHref="/garage"
           wishlistHref="/garage"
           searchAction="/search"
+          search={<SiteSearch />}
           onMenu={() => setMenuOpen(true)}
         >
           <CarChip label={api.label} onChange={openSelector} />

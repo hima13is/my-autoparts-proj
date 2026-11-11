@@ -10,6 +10,8 @@ export interface HeaderProps {
   wishlistHref?: string
   /** Where the search form submits (GET ?q=). */
   searchAction?: string
+  /** Replaces the plain search form, e.g. a <SearchBox> with suggestions. */
+  search?: ReactNode
   cartCount?: number
   onMenu?: () => void
   /** A row under the header, e.g. <CarChip>. */
@@ -27,13 +29,14 @@ export function Header({
   accountHref = "/account",
   wishlistHref = "/wishlist",
   searchAction = "/search",
+  search: searchSlot,
   cartCount = 0,
   onMenu,
   children,
   linkAs: Link = "a",
   className,
 }: HeaderProps) {
-  const search = (
+  const search = searchSlot ?? (
     <form
       role="search"
       action={searchAction}

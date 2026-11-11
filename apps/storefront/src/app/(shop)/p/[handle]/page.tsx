@@ -164,7 +164,8 @@ function FitList({ cars }: { cars: FitCar[] }) {
 
 function ProductSkeleton() {
   return (
-    <div className="grid gap-6 md:grid-cols-2" aria-busy="true" aria-label="Loading product">
+    <div className="grid gap-6 md:grid-cols-2" role="status" aria-busy="true">
+      <span className="sr-only">Loading product…</span>
       <Skeleton className="aspect-square w-full" />
       <div className="flex flex-col gap-4">
         <Skeleton className="h-8 w-3/4" />

@@ -83,7 +83,8 @@ export async function Listing({
 
 export function ListingSkeleton() {
   return (
-    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Loading products">
+    <div className="flex flex-col gap-4" role="status" aria-busy="true">
+      <span className="sr-only">Loading products…</span>
       <Skeleton className="h-11 w-full max-w-md" />
       <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => (

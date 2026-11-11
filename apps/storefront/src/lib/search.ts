@@ -55,3 +55,28 @@ export async function getProductsByIds(ids: string[]): Promise<StoreProduct[]> {
   const byId = new Map(products.map((p) => [p.id, p]))
   return ids.map((id) => byId.get(id)).filter((p): p is StoreProduct => Boolean(p))
 }
+
+export type Suggestion = { id: string; title: string; handle: string }
+
+/** Top matches for the header dropdown, read straight from the search index. */
+export async function searchSuggestions(q: string, fitKeys?: string[]): Promise<Suggestion[]> {
+  "use cache"
+  cacheTag(CATALOGUE_TAG)
+  cacheLife("minutes")
+  if (q.length < 2) return []
+  const { results } = await storePost<{
+    results: { hits: { id: string; document: { title?: string; handle?: string } }[] }[]
+  }>("/store/search", {
+    queries: [
+      {
+        entity: "product",
+        filters: { q, ...(fitKeys ? { fit_keys: { $overlaps: fitKeys } } : {}) },
+        search_options: { typo_tolerance: true, match_strategy: "last" },
+        pagination: { take: 6 },
+      },
+    ],
+  })
+  return (results[0]?.hits ?? [])
+    .filter((h) => h.document.title && h.document.handle)
+    .map((h) => ({ id: h.id, title: h.document.title!, handle: h.document.handle! }))
+}
