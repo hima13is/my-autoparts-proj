@@ -1,8 +1,8 @@
-import { checkFitment, type FitmentRule } from "../../lib/fitment"
-import { carFitKeys, fitKey } from "../helpers/fitment-keys"
-import { CATEGORY_KEYWORDS, keywordsFor } from "../helpers/keywords"
+import { checkFitment, type FitmentRule } from "../fitment"
+import { carFitKeys, fitKey } from "../../search/helpers/fitment-keys"
+import { CATEGORY_KEYWORDS, keywordsFor } from "../../search/helpers/keywords"
 import { DEMO_CATEGORIES } from "../../data/demo-catalogue"
-import { PRODUCT_EVENTS } from "../helpers/events"
+import { PRODUCT_EVENTS } from "../../search/helpers/events"
 
 describe("search fit keys", () => {
   const rules: FitmentRule[] = [

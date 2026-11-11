@@ -5,6 +5,7 @@ import { ProductOptionRow, toOptionValues } from "./helpers/option-values"
 import { loadPricing, priceFields, toProductPricing } from "./helpers/pricing"
 import { loadFitKeys } from "./helpers/fitment-keys"
 import { keywordsFor } from "./helpers/keywords"
+// Medusa imports every file under src/search/ at boot: keep tests out of this folder.
 import { PRODUCT_EVENTS } from "./helpers/events"
 import { resolveProductIds } from "./helpers/resolve-product-ids"
 
