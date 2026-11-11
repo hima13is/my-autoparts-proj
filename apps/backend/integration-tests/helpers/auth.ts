@@ -31,3 +31,21 @@ export async function adminHeaders(container: MedusaContainer, api: Api) {
   const { data } = await api.post("/auth/user/emailpass", { email, password })
   return { authorization: `Bearer ${data.token}` }
 }
+
+/** A "Website" sales channel plus a publishable key linked to it (what core product routes need). */
+export async function storeWithChannel(container: MedusaContainer) {
+  const { createSalesChannelsWorkflow, linkSalesChannelsToApiKeyWorkflow } =
+    await import("@medusajs/medusa/core-flows")
+  const {
+    result: [channel],
+  } = await createSalesChannelsWorkflow(container).run({
+    input: { salesChannelsData: [{ name: "Website" }] },
+  })
+  const [key] = await container
+    .resolve(Modules.API_KEY)
+    .createApiKeys([{ title: "store", type: "publishable", created_by: "test" }])
+  await linkSalesChannelsToApiKeyWorkflow(container).run({
+    input: { id: key.id, add: [channel.id] },
+  })
+  return { headers: { "x-publishable-api-key": key.token }, channelId: channel.id }
+}
