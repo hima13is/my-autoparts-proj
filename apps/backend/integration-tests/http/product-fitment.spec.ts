@@ -124,8 +124,28 @@ medusaIntegrationTestRunner({
         expect((await addRule(ids.seatCover, { generation_id: ids.gen2 })).status).toBe(422)
       })
 
-      it("store check needs a car and only answers for published products", async () => {
-        expect((await fits(ids.seatCover, "")).status).toBe(400)
+      it("lists the cars a product fits when no car is given", async () => {
+        await addRule(ids.seatCover, { generation_id: ids.gen2, notes: "Front and rear" })
+        await addRule(ids.sunshade, { generation_id: ids.gen2, variant_id: ids.sx })
+        await addRule(ids.perfume, {})
+        const seat = (await fits(ids.seatCover, "")).data
+        expect(seat).toMatchObject({ universal: false })
+        expect(seat.cars).toEqual([
+          expect.objectContaining({
+            make: "Hyundai",
+            model_slug: "creta",
+            generation: "2nd gen",
+            year_from: 2020,
+            year_to: null,
+            variant: null,
+            notes: "Front and rear",
+          }),
+        ])
+        expect((await fits(ids.sunshade, "")).data.cars[0].variant).toBe("SX(O)")
+        expect((await fits(ids.perfume, "")).data).toMatchObject({ universal: true, cars: [] })
+      })
+
+      it("store check only answers for published products", async () => {
         expect((await fits(ids.draft, `variant_id=${ids.e}`)).status).toBe(404)
         expect(
           (await fits(ids.seatCover, `generation_id=${ids.gen1}&variant_id=${ids.sx}`)).status
