@@ -69,7 +69,7 @@ export async function getRegionId(): Promise<string | undefined> {
     cacheLife("hours")
     return regions.find((r) => r.currency_code === "inr")?.id ?? regions[0]?.id
   } catch {
-    cacheLife("seconds")
+    cacheLife("minutes")
     return undefined
   }
 }
@@ -85,7 +85,7 @@ export async function getCategories(): Promise<Category[]> {
     cacheLife("hours")
     return product_categories
   } catch {
-    cacheLife("seconds")
+    cacheLife("minutes")
     return []
   }
 }

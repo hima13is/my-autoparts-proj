@@ -7,7 +7,9 @@ export const VEHICLES_TAG = "vehicles"
 /**
  * The full car tree for the selector. Cars change rarely, so it is cached for hours.
  * If the backend can't be reached (e.g. during a build without one) it returns an empty
- * tree cached for seconds only, so the real list appears as soon as the backend answers.
+ * tree cached for about a minute, so the real list appears soon after the backend answers.
+ * ("seconds" would be shorter, but Next treats such short caches as dynamic data, which
+ * makes the shop layout block prerendering and fails the build.)
  */
 export async function getVehicleCatalog(): Promise<VehicleCatalog> {
   "use cache"
@@ -17,7 +19,7 @@ export async function getVehicleCatalog(): Promise<VehicleCatalog> {
     cacheLife("hours")
     return catalog
   } catch {
-    cacheLife("seconds")
+    cacheLife("minutes")
     return { makes: [] }
   }
 }
