@@ -8,7 +8,27 @@
 import { slugify } from "../lib/fitment"
 import type { SeedGeneration, SeedMake, SeedModel } from "./vehicles"
 
-export type DemoCategory = { handle: string; name: string; description: string }
+export type DemoCategory = { handle: string; name: string; description: string; parent?: string }
+
+/** Top-level groups for the menu. Each demo category sits under one of them. */
+export const DEMO_CATEGORY_GROUPS: DemoCategory[] = [
+  { handle: "interior", name: "Interior", description: "Seat covers, mats, sunshades and more." },
+  { handle: "exterior", name: "Exterior & Care", description: "Covers and cleaning." },
+  { handle: "electronics", name: "Electronics", description: "Dashcams, lights and chargers." },
+]
+
+const GROUP_OF: Record<string, string> = {
+  "seat-covers": "interior",
+  "floor-mats": "interior",
+  sunshades: "interior",
+  "car-perfumes": "interior",
+  "steering-covers": "interior",
+  "car-covers": "exterior",
+  "car-care": "exterior",
+  lighting: "electronics",
+  dashcams: "electronics",
+  "phone-holders-chargers": "electronics",
+}
 
 export const DEMO_CATEGORIES: DemoCategory[] = [
   {
@@ -50,6 +70,7 @@ export const DEMO_CATEGORIES: DemoCategory[] = [
     description: "Grippy covers sized by steering diameter.",
   },
 ]
+for (const c of DEMO_CATEGORIES) c.parent = GROUP_OF[c.handle]
 
 /** A car reference by name, resolved to IDs when the catalogue is loaded. */
 export type CarRef = { make: string; model: string; generation: string; variants?: string[] }
@@ -102,6 +123,17 @@ function product(
     })),
   }
 }
+
+export const DEMO_BRANDS = [
+  "Gaadi Pro",
+  "Kavach",
+  "LumaDrive",
+  "Nirmal Care",
+  "RoadSaathi",
+  "Safar",
+  "ShineMax",
+  "UrbanTrim",
+]
 
 export function buildDemoCatalogue(vehicles: SeedMake[]): DemoProduct[] {
   const cars: Car[] = vehicles.flatMap((make) =>

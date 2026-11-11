@@ -19,7 +19,8 @@ export default async function seedDemoCatalogue({ container }: ExecArgs) {
   }
   const result = await loadDemoCatalogue(container, buildDemoCatalogue(VEHICLES))
   logger.info(
-    `Demo catalogue: ${result.products} products and ${result.fitments} fitment rows added, ` +
+    `Demo catalogue: ${result.products} products, ${result.fitments} fitment rows and ` +
+      `${result.brandsLinked} brand links added, ` +
       `${result.categories} categories created, ${result.skipped} products already there.`
   )
 }

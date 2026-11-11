@@ -8,10 +8,21 @@ import {
 import {
   createProductCategoriesWorkflow,
   createProductsWorkflow,
+  updateProductCategoriesWorkflow,
 } from "@medusajs/medusa/core-flows"
 import { VEHICLE_MODULE } from "../modules/vehicle"
 import type VehicleModuleService from "../modules/vehicle/service"
-import { DEMO_CATEGORIES, type CarRef, type DemoProduct } from "./demo-catalogue"
+import { slugify } from "../lib/fitment"
+import { BRAND_MODULE } from "../modules/brand"
+import type BrandModuleService from "../modules/brand/service"
+import {
+  DEMO_BRANDS,
+  DEMO_CATEGORIES,
+  DEMO_CATEGORY_GROUPS,
+  type CarRef,
+  type DemoCategory,
+  type DemoProduct,
+} from "./demo-catalogue"
 
 type FitmentRow = { product_id: string; generation_id: string | null; variant_id: string | null }
 
@@ -40,32 +51,63 @@ export async function loadDemoCatalogue(container: MedusaContainer, products: De
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const vehicles = container.resolve<VehicleModuleService>(VEHICLE_MODULE)
 
-  // Categories (create the missing ones).
+  // Categories: groups first, then the categories under them. Create missing ones and
+  // fix the parent of any category that was loaded before groups existed.
   const productModule = container.resolve(Modules.PRODUCT)
-  const existingCategories = await productModule.listProductCategories(
-    { handle: DEMO_CATEGORIES.map((c) => c.handle) },
-    { select: ["id", "handle"] }
-  )
-  const missingCategories = DEMO_CATEGORIES.filter(
-    (c) => !existingCategories.some((e) => e.handle === c.handle)
-  )
-  if (missingCategories.length) {
-    await createProductCategoriesWorkflow(container).run({
-      input: {
-        product_categories: missingCategories.map((c) => ({
-          name: c.name,
-          handle: c.handle,
-          description: c.description,
-          is_active: true,
-        })),
-      },
-    })
+  const ensureCategories = async (wanted: DemoCategory[], parentIds: Map<string, string>) => {
+    const existing = await productModule.listProductCategories(
+      { handle: wanted.map((c) => c.handle) },
+      { select: ["id", "handle", "parent_category_id"] }
+    )
+    const missing = wanted.filter((c) => !existing.some((e) => e.handle === c.handle))
+    if (missing.length) {
+      await createProductCategoriesWorkflow(container).run({
+        input: {
+          product_categories: missing.map((c) => ({
+            name: c.name,
+            handle: c.handle,
+            description: c.description,
+            is_active: true,
+            parent_category_id: c.parent ? parentIds.get(c.parent) : null,
+          })),
+        },
+      })
+    }
+    for (const row of existing) {
+      const parent = wanted.find((c) => c.handle === row.handle)?.parent
+      const parentId = parent ? parentIds.get(parent)! : null
+      if (row.parent_category_id !== parentId) {
+        await updateProductCategoriesWorkflow(container).run({
+          input: { selector: { id: row.id }, update: { parent_category_id: parentId } },
+        })
+      }
+    }
+    const all = await productModule.listProductCategories(
+      { handle: wanted.map((c) => c.handle) },
+      { select: ["id", "handle"] }
+    )
+    return { created: missing.length, ids: new Map(all.map((c) => [c.handle, c.id])) }
   }
-  const categories = await productModule.listProductCategories(
-    { handle: DEMO_CATEGORIES.map((c) => c.handle) },
+  const groups = await ensureCategories(DEMO_CATEGORY_GROUPS, new Map())
+  const leaves = await ensureCategories(DEMO_CATEGORIES, groups.ids)
+  const categoryId = leaves.ids
+  const missingCategories = { length: groups.created + leaves.created }
+
+  // Brands (create the missing ones).
+  const brandService = container.resolve<BrandModuleService>(BRAND_MODULE)
+  const brandHandles = DEMO_BRANDS.map(slugify)
+  const haveBrands = await brandService.listBrands({ handle: brandHandles }, { select: ["handle"] })
+  const newBrands = DEMO_BRANDS.filter(
+    (name) => !haveBrands.some((b) => b.handle === slugify(name))
+  )
+  if (newBrands.length) {
+    await brandService.createBrands(newBrands.map((name) => ({ name, handle: slugify(name) })))
+  }
+  const brands = await brandService.listBrands(
+    { handle: brandHandles },
     { select: ["id", "handle"] }
   )
-  const categoryId = new Map(categories.map((c) => [c.handle, c.id]))
+  const brandId = new Map(brands.map((b) => [b.handle, b.id]))
 
   const {
     data: [salesChannel],
@@ -125,7 +167,7 @@ export async function loadDemoCatalogue(container: MedusaContainer, products: De
           category_ids: [categoryId.get(p.category)!],
           sales_channels: [{ id: salesChannel.id }],
           shipping_profile_id: shippingProfile.id,
-          metadata: { brand: p.brand, demo: true },
+          metadata: { demo: true },
           options: [{ title: "Colour", values: p.variants.map((v) => v.colour) }],
           variants: p.variants.map((v) => ({
             title: v.title,
@@ -145,7 +187,25 @@ export async function loadDemoCatalogue(container: MedusaContainer, products: De
     fitments += rows.length
   }
 
+  // Link each demo product to its brand (also backfills products loaded before brands existed).
+  const { data: withBrands } = await query.graph({
+    entity: "product",
+    fields: ["id", "handle", "brand.id"],
+    filters: { handle: products.map((p) => p.handle) },
+  })
+  const unlinked = (withBrands as { id: string; handle: string; brand?: { id: string } | null }[])
+    .filter((row) => !row.brand)
+    .map((row) => {
+      const brand = products.find((p) => p.handle === row.handle)!.brand
+      return {
+        [Modules.PRODUCT]: { product_id: row.id },
+        [BRAND_MODULE]: { brand_id: brandId.get(slugify(brand))! },
+      }
+    })
+  if (unlinked.length) await container.resolve(ContainerRegistrationKeys.LINK).create(unlinked)
+
   return {
+    brandsLinked: unlinked.length,
     categories: missingCategories.length,
     products: toCreate.length,
     skipped: products.length - toCreate.length,

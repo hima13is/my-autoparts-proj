@@ -1,4 +1,9 @@
-import { buildDemoCatalogue, DEMO_CATEGORIES } from "../demo-catalogue"
+import {
+  buildDemoCatalogue,
+  DEMO_BRANDS,
+  DEMO_CATEGORIES,
+  DEMO_CATEGORY_GROUPS,
+} from "../demo-catalogue"
 import { VEHICLES } from "../vehicles"
 
 const catalogue = buildDemoCatalogue(VEHICLES)
@@ -64,5 +69,11 @@ describe("demo catalogue", () => {
       expect.stringContaining("(6-seater)"),
       expect.stringContaining("(7-seater)"),
     ])
+  })
+
+  it("uses only known brands and puts every category under a menu group", () => {
+    expect(catalogue.every((p) => DEMO_BRANDS.includes(p.brand))).toBe(true)
+    const groups = DEMO_CATEGORY_GROUPS.map((g) => g.handle)
+    expect(DEMO_CATEGORIES.every((c) => c.parent && groups.includes(c.parent))).toBe(true)
   })
 })
