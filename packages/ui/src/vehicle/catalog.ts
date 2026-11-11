@@ -3,11 +3,16 @@ export interface VehicleCatalog {
   makes: ReadonlyArray<{
     id: string
     name: string
+    /** URL slug, e.g. "maruti-suzuki" (for /cars/… pages). */
+    slug?: string
     models: ReadonlyArray<{
       id: string
       name: string
+      slug?: string
       years: ReadonlyArray<{
         year: number
+        /** The generation on sale that year (used to filter when no variant is picked). */
+        generationId?: string
         variants: ReadonlyArray<{ id: string; name: string }>
       }>
     }>
