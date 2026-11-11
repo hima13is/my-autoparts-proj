@@ -21,6 +21,7 @@
 | 11 Nov 2026 | **Phase 2 data defaults** | Until supplier data arrives, the catalogue is realistic **seed data** (~30 Indian car models, 100–200 products). Supplier spreadsheets replace it later. The Shiprocket PIN check runs **behind a mock** until API credentials exist. |
 | 11 Nov 2026 | **Product images: local storage until Phase 5** | Uses Medusa's default local file provider (files in the backend's `static/` folder). Railway's disk is reset on each deploy, so staging images are temporary. The storefront shows placeholders when a product has no image. Cloudflare R2 + CDN is set up in Phase 5. |
 | 11 Nov 2026 | **Brands** | A `brand` module linked to products (one brand per product). Demo brand names are invented. |
+| 11 Nov 2026 | **Search: Postgres, not Meilisearch** | Medusa 2.22's search module with its default Postgres provider meets the Phase 2 search tests (typos, synonyms, fits-my-car filter), so no Meilisearch service is needed. See [`adr/0004-search-postgres.md`](adr/0004-search-postgres.md). |
 
 ---
 

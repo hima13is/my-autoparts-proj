@@ -3,6 +3,9 @@ import { defineSearchIndex, graphConsume, graphSeed, search } from "@medusajs/fr
 
 import { ProductOptionRow, toOptionValues } from "./helpers/option-values"
 import { loadPricing, priceFields, toProductPricing } from "./helpers/pricing"
+import { loadFitKeys } from "./helpers/fitment-keys"
+import { keywordsFor } from "./helpers/keywords"
+import { PRODUCT_EVENTS } from "./helpers/events"
 import { resolveProductIds } from "./helpers/resolve-product-ids"
 
 const PRODUCT_GRAPH_FIELDS = [
@@ -15,6 +18,8 @@ const PRODUCT_GRAPH_FIELDS = [
   "created_at",
   "sales_channels.id",
   "categories.name",
+  "categories.handle",
+  "brand.name",
   "tags.value",
   "options.title",
   "options.values.value",
@@ -30,7 +35,8 @@ type ProductRow = {
   created_at?: string | Date | null
   deleted_at?: string | Date | null
   sales_channels?: ({ id?: string | null } | null)[] | null
-  categories?: ({ name?: string | null } | null)[] | null
+  categories?: ({ name?: string | null; handle?: string | null } | null)[] | null
+  brand?: { name?: string | null } | null
   tags?: ({ value?: string | null } | null)[] | null
   options?: ProductOptionRow[] | null
 }
@@ -47,6 +53,11 @@ const productFields = search.define({
   thumbnail: search.keyword().retrievable(),
   created_at: search.date().sortable().retrievable(),
   category: search.keyword().array().filterable().facetable().retrievable(),
+  brand: search.keyword().filterable().facetable().searchable({ weight: 2 }).retrievable(),
+  // Words shoppers type that aren't in titles ("cvr", "dash cam"): see helpers/keywords.ts.
+  keywords: search.text().searchable({ weight: 2 }),
+  // "Fits my car": "all" | "g:<generation>" | "v:<variant>" (see helpers/fitment-keys.ts).
+  fit_keys: search.keyword().array().filterable().retrievable(false),
   labels: search.keyword().array().filterable().facetable().retrievable(),
   option_values: search
     .keyword()
@@ -62,7 +73,8 @@ type ProductDocument = SearchTypes.InferSearchDocumentType<typeof productFields>
 
 function toDocument(
   product: ProductRow,
-  pricing: Parameters<typeof toProductPricing>[0]
+  pricing: Parameters<typeof toProductPricing>[0],
+  fitKeys: string[]
 ): ProductDocument {
   const category = (product.categories ?? [])
     .map((productCategory) => productCategory?.name?.trim())
@@ -84,6 +96,11 @@ function toDocument(
     thumbnail: product.thumbnail ?? null,
     created_at: product.created_at ?? null,
     category,
+    brand: product.brand?.name ?? null,
+    keywords: keywordsFor(
+      (product.categories ?? []).map((c) => c?.handle).filter((h): h is string => Boolean(h))
+    ),
+    fit_keys: fitKeys,
     labels,
     option_values: toOptionValues(product.options),
     ...toProductPricing(pricing),
@@ -98,44 +115,15 @@ function toDocument(
 const source = {
   fields: PRODUCT_GRAPH_FIELDS,
   transform: async (rows: ProductRow[], context: SearchTypes.SearchIngestionContext) => {
-    const pricing = await loadPricing(
-      rows.map((row) => row.id),
-      context
-    )
+    const ids = rows.map((row) => row.id)
+    const [pricing, fitKeys] = await Promise.all([
+      loadPricing(ids, context),
+      loadFitKeys(ids, context),
+    ])
 
-    return rows.map((row) => toDocument(row, pricing.get(row.id)))
+    return rows.map((row) => toDocument(row, pricing.get(row.id), fitKeys.get(row.id) ?? []))
   },
 }
-
-/**
- * Everything a document is built from, so a change to any of it re-indexes the
- * products it touches. Only `product.deleted` removes documents: a deleted
- * variant, option, tag or category means the product has to be re-read.
- *
- * TODO: price lists emit no events (create, update, delete, batch prices).
- * TODO: price lists crossing their start or end date change prices silently.
- * TODO: linkProductsToSalesChannelWorkflow emits nothing.
- * TODO: batchLinkProductsToCategoryWorkflow emits nothing.
- * TODO: upsertVariantPricesWorkflow emits nothing when called directly.
- */
-const PRODUCT_EVENTS = [
-  "product.created",
-  "product.updated",
-  "product.deleted",
-  "product-variant.created",
-  "product-variant.updated",
-  "product-variant.deleted",
-  "product-option.created",
-  "product-option.updated",
-  "product-option.deleted",
-  "product-option-value.updated",
-  "product-option-value.deleted",
-  "product-tag.updated",
-  "product-tag.deleted",
-  "product-category.updated",
-  "product-category.deleted",
-  "sales-channel.deleted",
-]
 
 export default defineSearchIndex({
   name: "product",
@@ -148,7 +136,12 @@ export default defineSearchIndex({
   events: PRODUCT_EVENTS,
   consume: graphConsume<typeof productFields, ProductRow>({
     ...source,
-    resolve_ids: resolveProductIds,
+    resolve_ids: async (event, context) =>
+      event.name === "fitment.changed"
+        ? [(event.data as { product_id?: string })?.product_id].filter((id): id is string =>
+            Boolean(id)
+          )
+        : resolveProductIds(event, context),
     is_delete: (event) => event.name === "product.deleted",
   }),
   seed: graphSeed<typeof productFields, ProductRow>(source),
