@@ -7,3 +7,6 @@ playwright-report
 test-results
 docs/PLAN.md
 apps/backend/src/migration-scripts
+next-env.d.ts
+storybook-static
+.lighthouseci

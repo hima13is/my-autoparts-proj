@@ -12,11 +12,29 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: { baseURL, trace: "on-first-retry", screenshot: "only-on-failure" },
-  projects: [
-    { name: "mobile-chrome", use: { ...devices["Pixel 7"] } },
-    { name: "mobile-safari", use: { ...devices["iPhone 14"] } },
-    { name: "desktop-chrome", use: { ...devices["Desktop Chrome"] } },
-  ],
+  // Screenshot comparisons only run with VISUAL=1, inside the Playwright Linux Docker
+  // image (CI job "visual" and scripts/visual-baselines.sh) so pixels match exactly.
+  expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.002, animations: "disabled" } },
+  snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}{ext}",
+  projects: process.env.VISUAL
+    ? [{ name: "visual", testMatch: /\.visual\.spec\.ts$/, use: { ...devices["Desktop Chrome"] } }]
+    : [
+        {
+          name: "mobile-chrome",
+          testIgnore: /\.visual\.spec\.ts$/,
+          use: { ...devices["Pixel 7"] },
+        },
+        {
+          name: "mobile-safari",
+          testIgnore: /\.visual\.spec\.ts$/,
+          use: { ...devices["iPhone 14"] },
+        },
+        {
+          name: "desktop-chrome",
+          testIgnore: /\.visual\.spec\.ts$/,
+          use: { ...devices["Desktop Chrome"] },
+        },
+      ],
   // Start the built storefront, unless testing an already-deployed URL (e.g. staging).
   webServer: process.env.E2E_BASE_URL
     ? undefined

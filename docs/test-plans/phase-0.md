@@ -1,5 +1,7 @@
 # Build Phase 0: Test report & manual test script
 
+> **✅ Signed off by the owner on 9 Nov 2026.** Merged as PR #1 and tagged `v0.1.0`.
+
 ## Automated results
 
 Local runs on Windows 11 (Node 24.11.1) with real Docker Postgres/Redis; CI on GitHub Actions (Ubuntu, Node 24).
@@ -64,7 +66,7 @@ Staging runs Postgres + backend only. Redis and Meilisearch are added when a pha
 ## Known follow-ups (not blocking Phase 0)
 
 - **Railway config before 1 Dec 2026:** `railway.json` (Config as Code) is deprecated; migrate to `.railway/railway.ts` with `railway config migrate`.
-- **Railway auto-deploys:** install the Railway GitHub App on this repo so pushes deploy automatically; after merge, set the backend's deploy branch to `main` in the Railway dashboard.
+- ✅ **Railway auto-deploys:** the owner installed the Railway GitHub App; the backend deploys from `main`.
 - **Sentry source maps:** stack traces are minified until we add a Sentry auth token for uploads (Phase 5 hardening).
 - **Sentry + Turbopack warning** "Failed to register diagnostics-channel injection hooks": only affects performance spans, which we don't record. Revisit when upgrading Sentry.
 - **Custom domain + Cloudflare DNS:** postponed until the domain is bought.
