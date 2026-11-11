@@ -32,8 +32,8 @@ Env var names are listed in `.env.example`; values live in Vercel/Railway only. 
 | Phase                                    | Status                                                | Tag                      |
 | ---------------------------------------- | ----------------------------------------------------- | ------------------------ |
 | 0 · Foundations & setup                  | ✅ Signed off 9 Nov 2026                              | `v0.1.0`                 |
-| 1 · Brand & design system                | Built 9 Nov 2026, waiting for owner sign-off (PR #14) | `v0.2.0` once signed off |
-| 2 · Catalogue, vehicle selector & search | Next                                                  |                          |
+| 1 · Brand & design system                | ✅ Signed off 11 Nov 2026                             | `v0.2.0`                 |
+| 2 · Catalogue, vehicle selector & search | In progress                                           |                          |
 | 3–5                                      | Not started                                           |                          |
 
 Details per phase: [`docs/test-plans/`](docs/test-plans/).

@@ -1,6 +1,6 @@
 # my-autoparts-proj: Product & Technical Plan (v0.1, draft for review)
 
-> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 built 9 Nov 2026, waiting for owner sign-off (PR #14). Next: Build Phase 2.
+> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 in progress.
 > Date: 5 Nov 2026 · Author: Claude (architect/designer) · Reviewer: project owner
 
 ## Decisions log
@@ -18,6 +18,7 @@
 | 9 Nov 2026 | **Sentry: errors only, no customer data** | Sentry 11.8 in both apps. All of Sentry's default data collection (user info, cookies, headers, bodies, SQL, stack variables) is switched off. No performance tracing yet. Source-map upload is planned for Phase 5. |
 | 9 Nov 2026 | **PR merge policy** | The owner signs off phase PRs. Claude may merge maintenance PRs (Dependabot, small CI fixes) once CI is green, skipping versions released less than 2 weeks ago. React majors are ignored for the backend (Medusa admin needs React 18). |
 | 9 Nov 2026 | **Design system** | `packages/ui` on native HTML elements (no component library). Storybook 10 stories double as accessibility tests, and screenshot baselines are made in the Playwright Linux Docker image. See [`adr/0003-design-system.md`](adr/0003-design-system.md). |
+| 11 Nov 2026 | **Phase 2 data defaults** | Until supplier data arrives, the catalogue is realistic **seed data** (~30 Indian car models, 100–200 products). Supplier spreadsheets replace it later. The Shiprocket PIN check runs **behind a mock** until API credentials exist. |
 
 ---
 
@@ -841,7 +842,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 **Exit criteria:** you approve the visual style; 0 axe violations; visual snapshots baselined; Lighthouse accessibility ≥ 95 on prototype pages. Tag `v0.2.0`.
 
-> **Status: built 9 Nov 2026, waiting for owner sign-off** ([PR #14](https://github.com/hima13is/my-autoparts-proj/pull/14)). All automated exit criteria are met: 0 axe violations (49 stories, 4 pages), 70 screenshot baselines, Lighthouse accessibility 98–100. Report: [`test-plans/phase-1.md`](test-plans/phase-1.md).
+> **Status: ✅ signed off 11 Nov 2026, tagged `v0.2.0`** ([PR #14](https://github.com/hima13is/my-autoparts-proj/pull/14)). All automated exit criteria are met: 0 axe violations (49 stories, 4 pages), 70 screenshot baselines, Lighthouse accessibility 98–100. Report: [`test-plans/phase-1.md`](test-plans/phase-1.md).
 
 ---
 
