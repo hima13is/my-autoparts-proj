@@ -138,6 +138,33 @@ medusaIntegrationTestRunner({
         })
         expect(res.status).toBe(401)
       })
+
+      it("summarises badge states for a grid in one call", async () => {
+        await addRule(ids.seatCover, { generation_id: ids.gen2 })
+        await addRule(ids.sunshade, { generation_id: ids.gen2, variant_id: ids.sx })
+        await addRule(ids.perfume, {})
+        const list = [ids.seatCover, ids.sunshade, ids.perfume]
+          .map((id) => `product_id[]=${id}`)
+          .join("&")
+        const summary = async (car: string) =>
+          (await api.get(`/store/fitment/summary?${list}${car}`, opts(store))).data.fitment
+
+        expect(await summary(`&variant_id=${ids.e}`)).toEqual({
+          [ids.seatCover]: "fits",
+          [ids.sunshade]: "no-fit",
+          [ids.perfume]: "universal",
+        })
+        expect(await summary(`&generation_id=${ids.gen1}`)).toMatchObject({
+          [ids.seatCover]: "no-fit",
+          [ids.perfume]: "universal",
+        })
+        expect(await summary("")).toEqual({
+          [ids.seatCover]: "unknown",
+          [ids.sunshade]: "unknown",
+          [ids.perfume]: "universal",
+        })
+        expect((await api.get("/store/fitment/summary", opts(store))).status).toBe(400)
+      })
     })
   },
 })

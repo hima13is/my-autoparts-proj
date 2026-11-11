@@ -12,6 +12,7 @@ import {
   type VehicleCatalog,
 } from "@autoparts/ui"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   createContext,
   useCallback,
@@ -21,6 +22,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
+import { CAR_COOKIE, encodeCarCookie, writeCarCookie } from "@/lib/car-cookie"
 import { clearCurrent, pruneGarage, selectCar, withGeneration, type GarageCar } from "@/lib/garage"
 import { updateGarage, useGarage } from "@/lib/garage-store"
 
@@ -46,7 +48,12 @@ export function useCar(): CarApi {
 const footerColumns = [
   {
     title: "Shop",
-    links: [{ label: "My Garage", href: "/garage" }],
+    links: [
+      { label: "Seat covers", href: "/c/seat-covers" },
+      { label: "Floor mats", href: "/c/floor-mats" },
+      { label: "Dashcams", href: "/c/dashcams" },
+      { label: "My Garage", href: "/garage" },
+    ],
   },
   {
     title: "FitGaadi",
@@ -59,6 +66,17 @@ export function SiteShell({ catalog, children }: { catalog: VehicleCatalog; chil
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const openSelector = useCallback(() => setSelectorOpen(true), [])
+
+  // Mirror the current car into a cookie so server-rendered grids filter for it, and
+  // re-render them whenever it changes (also on first visit after a reload).
+  const router = useRouter()
+  useEffect(() => {
+    const wanted = encodeCarCookie(garage.current)
+    const match = document.cookie.match(new RegExp(`(?:^|; )${CAR_COOKIE}=([^;]*)`))
+    if ((match?.[1] ?? "") === wanted) return
+    writeCarCookie(garage.current)
+    router.refresh()
+  }, [garage, router])
 
   // Forget cars that were removed from the catalogue since they were saved.
   useEffect(() => {
