@@ -32,6 +32,7 @@ export type StoreProduct = {
   title: string
   handle: string
   thumbnail: string | null
+  created_at?: string
   brand?: { name: string; handle: string } | null
   categories?: { handle: string }[] | null
   variants: StoreVariant[]
@@ -107,7 +108,19 @@ export async function listProducts(
     "category_id[]": opts.categoryIds,
     ...opts.fit,
   })
-  return products
+  return products.sort(byNewest)
+}
+
+/**
+ * Newest first, then by handle. Products loaded in one batch share a created_at, and
+ * Postgres returns ties in any order, so without the tie-breaker paging would shuffle.
+ */
+export function byNewest(
+  a: Pick<StoreProduct, "created_at" | "handle">,
+  b: Pick<StoreProduct, "created_at" | "handle">
+): number {
+  const time = (p: { created_at?: string }) => (p.created_at ? Date.parse(p.created_at) : 0)
+  return time(b) - time(a) || a.handle.localeCompare(b.handle)
 }
 
 /** Badge state per product for the shopper's car (or "universal"/"unknown" without one). */

@@ -3,6 +3,7 @@ import { listingHref } from "../../components/listing-controls"
 import { decodeCarCookie, encodeCarCookie } from "../car-cookie"
 import {
   arrangeProducts,
+  byNewest,
   parseSort,
   PER_PAGE,
   toCardProduct,
@@ -112,5 +113,18 @@ describe("car cookie", () => {
     expect(decodeCarCookie(undefined)).toBeUndefined()
     expect(decodeCarCookie("%7Bnot-json")).toBeUndefined()
     expect(decodeCarCookie(encodeURIComponent(JSON.stringify({ year: "x" })))).toBeUndefined()
+  })
+})
+
+describe("byNewest", () => {
+  it("puts newer products first and breaks ties by handle", () => {
+    const same = "2026-11-10T10:00:00.000Z"
+    const products = [
+      { handle: "b-mat", created_at: same },
+      { handle: "old", created_at: "2026-11-01T10:00:00.000Z" },
+      { handle: "new", created_at: "2026-11-11T10:00:00.000Z" },
+      { handle: "a-mat", created_at: same },
+    ]
+    expect(products.sort(byNewest).map((p) => p.handle)).toEqual(["new", "a-mat", "b-mat", "old"])
   })
 })
