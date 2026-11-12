@@ -6,9 +6,11 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import { ChooseCarButton } from "@/components/car-actions"
 import { Listing, ListingSkeleton } from "@/components/listing"
+import { JsonLd } from "@/components/json-ld"
 import { CAR_COOKIE, decodeCarCookie } from "@/lib/car-cookie"
 import { getCategories } from "@/lib/catalogue"
 import { fitParams } from "@/lib/garage"
+import { breadcrumbJsonLd, type Crumb } from "@/lib/seo"
 import { getVehicleCatalog } from "@/lib/vehicles"
 
 export async function generateMetadata({ params }: PageProps<"/c/[handle]">): Promise<Metadata> {
@@ -44,6 +46,11 @@ async function CategoryContent({ params, searchParams }: PageProps<"/c/[handle]"
   if (!category) notFound()
 
   const parent = categories.find((c) => c.id === category.parent_category_id)
+  const crumbs: Crumb[] = [
+    { label: "Home", href: "/" },
+    ...(parent ? [{ label: parent.name, href: `/c/${parent.handle}` }] : []),
+    { label: category.name },
+  ]
   const children = categories.filter((c) => c.parent_category_id === category.id)
   const categoryIds = [category.id, ...children.map((c) => c.id)]
 
@@ -56,14 +63,8 @@ async function CategoryContent({ params, searchParams }: PageProps<"/c/[handle]"
 
   return (
     <>
-      <Breadcrumb
-        linkAs={Link}
-        items={[
-          { label: "Home", href: "/" },
-          ...(parent ? [{ label: parent.name, href: `/c/${parent.handle}` }] : []),
-          { label: category.name },
-        ]}
-      />
+      <JsonLd data={breadcrumbJsonLd(crumbs, `/c/${category.handle}`)} />
+      <Breadcrumb linkAs={Link} items={crumbs} />
       <h1 className="font-heading text-3xl font-bold text-ink">{category.name}</h1>
 
       {children.length > 0 && (

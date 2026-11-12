@@ -4,10 +4,12 @@ import { cookies } from "next/headers"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
+import { JsonLd } from "@/components/json-ld"
 import { CAR_COOKIE, decodeCarCookie } from "@/lib/car-cookie"
 import { getCategories, toCardProduct } from "@/lib/catalogue"
 import { buyVariants, getProduct, getProductFit, yearRange, type FitCar } from "@/lib/product"
 import { productImageFor } from "@/lib/product-image"
+import { breadcrumbJsonLd, productJsonLd, type Crumb } from "@/lib/seo"
 import { BuyBox, DeliveryPanel, FitmentPanel } from "./product-panels"
 
 export async function generateMetadata({ params }: PageProps<"/p/[handle]">): Promise<Metadata> {
@@ -64,17 +66,27 @@ async function ProductContent({ params }: PageProps<"/p/[handle]">) {
   const card = toCardProduct(product)
   const category = categories.find((c) => c.handle === card.categoryHandle)
   const image = product.images[0]?.url ?? productImageFor(card)
+  const variants = buyVariants(product)
+  const crumbs: Crumb[] = [
+    { label: "Home", href: "/" },
+    ...(category ? [{ label: category.name, href: `/c/${category.handle}` }] : []),
+    { label: product.title },
+  ]
 
   return (
     <>
-      <Breadcrumb
-        linkAs={Link}
-        items={[
-          { label: "Home", href: "/" },
-          ...(category ? [{ label: category.name, href: `/c/${category.handle}` }] : []),
-          { label: product.title },
-        ]}
+      <JsonLd
+        data={productJsonLd({
+          title: product.title,
+          handle: product.handle,
+          description: product.description,
+          image,
+          brand: card.brand,
+          prices: variants.map((v) => v.price),
+        })}
       />
+      <JsonLd data={breadcrumbJsonLd(crumbs, `/p/${product.handle}`)} />
+      <Breadcrumb linkAs={Link} items={crumbs} />
 
       <div className="mt-2 grid gap-6 md:grid-cols-2 md:gap-10">
         <section aria-label="Product images" className="md:sticky md:top-4 md:self-start">
@@ -98,7 +110,7 @@ async function ProductContent({ params }: PageProps<"/p/[handle]">) {
             </h1>
           </div>
           <FitmentPanel verdict={verdict} notes={notes} />
-          <BuyBox variants={buyVariants(product)} />
+          <BuyBox variants={variants} />
           <DeliveryPanel />
           {product.description && <p className="max-w-prose">{product.description}</p>}
 

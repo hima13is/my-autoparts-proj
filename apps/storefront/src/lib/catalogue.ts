@@ -185,3 +185,20 @@ export function arrangeProducts(
 export function parseSort(value: unknown): SortKey {
   return SORTS.some((s) => s.value === value) ? (value as SortKey) : "featured"
 }
+
+/** Every product handle, for the sitemap. Empty (cached briefly) when the backend is down. */
+export async function listProductHandles(): Promise<{ handle: string }[]> {
+  "use cache"
+  cacheTag(CATALOGUE_TAG)
+  try {
+    const { products } = await storeGet<{ products: { handle: string }[] }>("/store/products", {
+      fields: "handle",
+      limit: LIST_LIMIT,
+    })
+    cacheLife("hours")
+    return products
+  } catch {
+    cacheLife("minutes")
+    return []
+  }
+}
