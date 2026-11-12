@@ -20,7 +20,7 @@
 | Storybook    | https://fitgaadi-storybook.vercel.app                 |
 | Pull request | https://github.com/hima13is/my-autoparts-proj/pull/16 |
 
-> Staging needs real data before the manual steps below work there: the storefront's publishable key on Vercel and the demo catalogue on Railway. Until then, run them locally (`pnpm dev`).
+> Phase 2 runs on staging since 12 Nov 2026: the Railway backend is deployed from this branch with the demo catalogue loaded, and the pull request's Vercel preview (linked from the PR) uses it. The main storefront URL shows Phase 2 only after the merge to `main`.
 
 ## Automated results (12 Nov 2026)
 
