@@ -1,6 +1,6 @@
 # my-autoparts-proj: Product & Technical Plan (v0.1, draft for review)
 
-> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 built 9 Nov 2026, waiting for owner sign-off (PR #14). Next: Build Phase 2.
+> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 in progress (tasks 1–7 of 7 done, 12 Nov 2026).
 > Date: 5 Nov 2026 · Author: Claude (architect/designer) · Reviewer: project owner
 
 ## Decisions log
@@ -18,6 +18,10 @@
 | 9 Nov 2026 | **Sentry: errors only, no customer data** | Sentry 11.8 in both apps. All of Sentry's default data collection (user info, cookies, headers, bodies, SQL, stack variables) is switched off. No performance tracing yet. Source-map upload is planned for Phase 5. |
 | 9 Nov 2026 | **PR merge policy** | The owner signs off phase PRs. Claude may merge maintenance PRs (Dependabot, small CI fixes) once CI is green, skipping versions released less than 2 weeks ago. React majors are ignored for the backend (Medusa admin needs React 18). |
 | 9 Nov 2026 | **Design system** | `packages/ui` on native HTML elements (no component library). Storybook 10 stories double as accessibility tests, and screenshot baselines are made in the Playwright Linux Docker image. See [`adr/0003-design-system.md`](adr/0003-design-system.md). |
+| 11 Nov 2026 | **Phase 2 data defaults** | Until supplier data arrives, the catalogue is realistic **seed data** (~30 Indian car models, 100–200 products). Supplier spreadsheets replace it later. The Shiprocket PIN check runs **behind a mock** until API credentials exist. |
+| 11 Nov 2026 | **Product images: local storage until Phase 5** | Uses Medusa's default local file provider (files in the backend's `static/` folder). Railway's disk is reset on each deploy, so staging images are temporary. The storefront shows placeholders when a product has no image. Cloudflare R2 + CDN is set up in Phase 5. |
+| 11 Nov 2026 | **Brands** | A `brand` module linked to products (one brand per product). Demo brand names are invented. |
+| 11 Nov 2026 | **Search: Postgres, not Meilisearch** | Medusa 2.22's search module with its default Postgres provider meets the Phase 2 search tests (typos, synonyms, fits-my-car filter), so no Meilisearch service is needed. See [`adr/0004-search-postgres.md`](adr/0004-search-postgres.md). |
 
 ---
 
@@ -841,7 +845,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 **Exit criteria:** you approve the visual style; 0 axe violations; visual snapshots baselined; Lighthouse accessibility ≥ 95 on prototype pages. Tag `v0.2.0`.
 
-> **Status: built 9 Nov 2026, waiting for owner sign-off** ([PR #14](https://github.com/hima13is/my-autoparts-proj/pull/14)). All automated exit criteria are met: 0 axe violations (49 stories, 4 pages), 70 screenshot baselines, Lighthouse accessibility 98–100. Report: [`test-plans/phase-1.md`](test-plans/phase-1.md).
+> **Status: ✅ signed off 11 Nov 2026, tagged `v0.2.0`** ([PR #14](https://github.com/hima13is/my-autoparts-proj/pull/14)). All automated exit criteria are met: 0 axe violations (49 stories, 4 pages), 70 screenshot baselines, Lighthouse accessibility 98–100. Report: [`test-plans/phase-1.md`](test-plans/phase-1.md).
 
 ---
 
@@ -876,6 +880,25 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 6. Google "rich results test", paste one product URL → it shows Product with price and rating.
 
 **Exit criteria:** all tests green; 3-click journey proven by E2E; performance budgets met; you've tried it with your own car. Tag `v0.3.0`.
+
+> **Status (12 Nov 2026): in progress, [draft PR #16](https://github.com/hima13is/my-autoparts-proj/pull/16).**
+> - ✅ **1. Vehicle & fitment module:** make → model → generation → variant; fitment for a generation, one variant, or universal. Store and admin APIs, plus fitment workflows that emit `fitment.changed`.
+> - ✅ **2. Seed data:**
+>   - the launch car list (7 makes, 34 models, 50 generations, 156 variants) is loaded by a migration script on every environment
+>   - 121 demo products are loaded by a guarded script, on local/staging only
+>   - the owner should review `apps/backend/src/data/vehicles.ts`
+> - ✅ **3. Categories, brands, images:** a brand module; categories under Interior / Exterior & Care / Electronics; images on local storage with placeholders until Phase 5 (R2).
+> - ✅ **4. Storefront:**
+>   - vehicle selector and My Garage (on the device, mirrored to a cookie for server rendering)
+>   - home, `/c/[handle]`, `/cars/[make]/[model]`, `/p/[handle]` (fit verdict, "check another car", the cars it fits)
+>   - a branded 404; the Phase 0 page moved to `/status`
+> - ✅ **5. Search:** Medusa's search module on Postgres instead of Meilisearch ([ADR 0004](adr/0004-search-postgres.md)). It handles typos and synonyms ("seet cvr", "dascam"), the fits-my-car filter, `/search`, and instant suggestions in the header.
+> - ✅ **6. PIN-code delivery estimate:** `/store/delivery-estimate` with a zone-based mock until Shiprocket credentials exist; the product page remembers the last PIN.
+> - ✅ **7. SEO basics:** titles, descriptions, absolute canonicals, Product + BreadcrumbList JSON-LD, sitemap.xml, and robots.txt (blocks indexing until `ALLOW_INDEXING=true` at launch).
+> - ✅ **Manual test script:** [`test-plans/phase-2.md`](test-plans/phase-2.md).
+> - ⏳ **Still to do:** the performance budget (local Lighthouse: home 90, category 76, product 67, car page 67; target 90) and staging (publishable key on Vercel, demo data on Railway).
+>
+> **Tests so far:** 75 backend unit tests, 41 backend integration tests (including the 20-product fit fixture), 24 storefront unit tests, 98 E2E tests on Pixel 7 / iPhone 14 / desktop with axe, and 55 Storybook stories with axe.
 
 ---
 

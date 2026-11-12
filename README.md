@@ -29,14 +29,18 @@ Env var names are listed in `.env.example`; values live in Vercel/Railway only. 
 
 ## Project status
 
-| Phase                                    | Status                                                | Tag                      |
-| ---------------------------------------- | ----------------------------------------------------- | ------------------------ |
-| 0 · Foundations & setup                  | ✅ Signed off 9 Nov 2026                              | `v0.1.0`                 |
-| 1 · Brand & design system                | Built 9 Nov 2026, waiting for owner sign-off (PR #14) | `v0.2.0` once signed off |
-| 2 · Catalogue, vehicle selector & search | Next                                                  |                          |
-| 3–5                                      | Not started                                           |                          |
+| Phase                                    | Status                                          | Tag      |
+| ---------------------------------------- | ----------------------------------------------- | -------- |
+| 0 · Foundations & setup                  | ✅ Signed off 9 Nov 2026                        | `v0.1.0` |
+| 1 · Brand & design system                | ✅ Signed off 11 Nov 2026                       | `v0.2.0` |
+| 2 · Catalogue, vehicle selector & search | In progress: tasks 1–7 of 7 done (draft PR #16) |          |
+| 3–5                                      | Not started                                     |          |
 
 Details per phase: [`docs/test-plans/`](docs/test-plans/).
+
+**Phase 2 so far (12 Nov 2026):** car list (34 Indian models), fitment rules, demo catalogue (121 products, local/staging only), brands and categories, the "fits my car" filter, vehicle selector + My Garage, home, category, car, product and search pages, instant search suggestions, branded 404, PIN-code delivery estimate (mock until Shiprocket), structured data, sitemap and robots.txt. Manual test script: [`docs/test-plans/phase-2.md`](docs/test-plans/phase-2.md). **Still to do:** the performance budget on category/product/car pages, and real data on staging.
+
+**Demo products (local/staging only):** `cd apps/backend; $env:ALLOW_DEMO_DATA="true"; pnpm exec medusa exec ./src/scripts/seed-demo-catalogue.ts`. The storefront also needs `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` in `apps/storefront/.env.local` (the key from the local database).
 
 ## One-time setup (Windows)
 

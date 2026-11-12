@@ -56,5 +56,6 @@ export {
 export { CarChip, type CarChipProps } from "./vehicle/CarChip"
 
 export { Header, type HeaderProps } from "./patterns/Header"
+export { SearchBox, type SearchBoxProps, type SearchSuggestion } from "./patterns/SearchBox"
 export { Footer, type FooterProps } from "./patterns/Footer"
 export { TrustStrip } from "./patterns/TrustStrip"
