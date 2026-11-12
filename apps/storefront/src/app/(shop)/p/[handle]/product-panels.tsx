@@ -1,9 +1,15 @@
 "use client"
 
-import { Button, Card, FitBadge, PriceBlock, RadioGroup } from "@autoparts/ui"
-import { ShoppingCart } from "lucide-react"
-import { useState } from "react"
+import { Button, Card, FitBadge, Input, PriceBlock, RadioGroup } from "@autoparts/ui"
+import { MapPin, ShoppingCart, Truck } from "lucide-react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
 import { useCar } from "@/components/site-shell"
+import {
+  describeEstimate,
+  normalisePincode,
+  PIN_STORAGE_KEY,
+  type DeliveryEstimate,
+} from "@/lib/delivery"
 import type { BuyVariant } from "@/lib/product"
 
 /**
@@ -88,5 +94,130 @@ export function BuyBox({ variants }: { variants: BuyVariant[] }) {
         </p>
       </div>
     </div>
+  )
+}
+
+type DeliveryState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "done"; estimate: DeliveryEstimate }
+
+const readSavedPin = () => {
+  try {
+    return normalisePincode(localStorage.getItem(PIN_STORAGE_KEY))
+  } catch {
+    return null
+  }
+}
+
+const savePin = (pin: string) => {
+  try {
+    localStorage.setItem(PIN_STORAGE_KEY, pin)
+  } catch {
+    // Private mode or blocked storage: the check still works, it just isn't remembered.
+  }
+}
+
+const pinField = (form: HTMLFormElement | null) =>
+  form?.elements.namedItem("pincode") as HTMLInputElement | null
+
+const UNAVAILABLE = "We couldn't check delivery right now. Please try again."
+
+async function fetchEstimate(pin: string): Promise<DeliveryState> {
+  try {
+    const res = await fetch(`/api/delivery?pincode=${pin}`)
+    const body = (await res.json()) as { estimate?: DeliveryEstimate; error?: string }
+    if (!res.ok || !body.estimate) return { kind: "error", message: body.error ?? UNAVAILABLE }
+    savePin(pin)
+    return { kind: "done", estimate: body.estimate }
+  } catch {
+    return { kind: "error", message: UNAVAILABLE }
+  }
+}
+
+/**
+ * "Deliver to" check. The input is uncontrolled so digits typed before hydration survive.
+ * The last PIN is remembered on this device and re-checked on the next product page.
+ */
+export function DeliveryPanel() {
+  const formRef = useRef<HTMLFormElement>(null)
+  const [state, setState] = useState<DeliveryState>({ kind: "idle" })
+  const [fieldError, setFieldError] = useState<string>()
+
+  // Re-check the PIN remembered from an earlier product page.
+  useEffect(() => {
+    const saved = readSavedPin()
+    const input = pinField(formRef.current)
+    if (!saved || !input || input.value) return
+    input.value = saved
+    void fetchEstimate(saved).then(setState)
+  }, [])
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const pin = normalisePincode(pinField(formRef.current)?.value)
+    if (!pin) {
+      setState({ kind: "idle" })
+      setFieldError("Enter a 6-digit PIN code.")
+      pinField(formRef.current)?.focus()
+      return
+    }
+    setFieldError(undefined)
+    setState({ kind: "loading" })
+    void fetchEstimate(pin).then(setState)
+  }
+
+  const estimate = state.kind === "done" ? state.estimate : null
+  return (
+    <Card
+      as="section"
+      aria-labelledby="delivery-title"
+      padding="md"
+      className="flex flex-col gap-3"
+    >
+      <h2 id="delivery-title" className="font-heading text-lg font-bold text-ink">
+        Delivery
+      </h2>
+      <form ref={formRef} onSubmit={onSubmit} noValidate className="flex items-start gap-2">
+        <Input
+          label="PIN code"
+          name="pincode"
+          inputMode="numeric"
+          autoComplete="postal-code"
+          maxLength={7}
+          placeholder="e.g. 110001"
+          leading={<MapPin className="size-5" aria-hidden />}
+          error={fieldError}
+          className="flex-1"
+        />
+        <Button
+          type="submit"
+          variant="secondary"
+          loading={state.kind === "loading"}
+          className="mt-[1.625rem]"
+        >
+          Check
+        </Button>
+      </form>
+      <div role="status" aria-live="polite" className="flex flex-col gap-1">
+        {state.kind === "error" && <p className="text-brick">{state.message}</p>}
+        {estimate && (
+          <>
+            <p className="flex items-start gap-2 font-semibold text-ink">
+              <Truck className="mt-0.5 size-5 shrink-0" aria-hidden />
+              {describeEstimate(estimate)}
+            </p>
+            {estimate.serviceable && (
+              <p className="text-sm text-graphite">
+                {estimate.cod
+                  ? "Cash on delivery is available."
+                  : "Pay online for this PIN code: cash on delivery isn't available."}
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </Card>
   )
 }

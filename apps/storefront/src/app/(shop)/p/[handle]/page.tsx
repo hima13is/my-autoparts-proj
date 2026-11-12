@@ -8,7 +8,7 @@ import { CAR_COOKIE, decodeCarCookie } from "@/lib/car-cookie"
 import { getCategories, toCardProduct } from "@/lib/catalogue"
 import { buyVariants, getProduct, getProductFit, yearRange, type FitCar } from "@/lib/product"
 import { productImageFor } from "@/lib/product-image"
-import { BuyBox, FitmentPanel } from "./product-panels"
+import { BuyBox, DeliveryPanel, FitmentPanel } from "./product-panels"
 
 export async function generateMetadata({ params }: PageProps<"/p/[handle]">): Promise<Metadata> {
   const { handle } = await params
@@ -99,6 +99,7 @@ async function ProductContent({ params }: PageProps<"/p/[handle]">) {
           </div>
           <FitmentPanel verdict={verdict} notes={notes} />
           <BuyBox variants={buyVariants(product)} />
+          <DeliveryPanel />
           {product.description && <p className="max-w-prose">{product.description}</p>}
 
           <section aria-labelledby="fits-list">
