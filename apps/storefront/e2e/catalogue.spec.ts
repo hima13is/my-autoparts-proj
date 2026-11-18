@@ -26,8 +26,10 @@ test.describe("Category pages", () => {
     await page.goto("/c/seat-covers")
     await expect(page.getByRole("heading", { level: 1, name: "Seat Covers" })).toBeVisible()
     const products = grid(page, /Seat Covers products/)
-    // No car yet: everything is listed and car-specific items ask to check fit.
-    await expect(products.getByRole("link", { name: /Swift 2024–present/ })).toBeVisible()
+    // No car yet: all 39 demo seat covers are listed and car-specific items ask to check
+    // fit. (Don't look for one product here: which ones land on page 1 depends on the
+    // seed's created_at timestamps.)
+    await expect(page.getByText("39 products", { exact: true })).toBeVisible()
     await expect(products.getByText("Check fitment").first()).toBeVisible()
     expect(await axe(page)).toEqual([])
 
