@@ -1,6 +1,6 @@
 # my-autoparts-proj: Product & Technical Plan (v0.1, draft for review)
 
-> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 in progress (tasks 1–7 of 7 done, 12 Nov 2026).
+> Status: **APPROVED on 5 Nov 2026.** Build Phase 0 signed off 9 Nov 2026 (`v0.1.0`). Build Phase 1 signed off 11 Nov 2026 (`v0.2.0`). Build Phase 2 signed off 18 Nov 2026 (`v0.3.0`).
 > Date: 5 Nov 2026 · Author: Claude (architect/designer) · Reviewer: project owner
 
 ## Decisions log
@@ -21,6 +21,7 @@
 | 11 Nov 2026 | **Phase 2 data defaults** | Until supplier data arrives, the catalogue is realistic **seed data** (~30 Indian car models, 100–200 products). Supplier spreadsheets replace it later. The Shiprocket PIN check runs **behind a mock** until API credentials exist. |
 | 11 Nov 2026 | **Product images: local storage until Phase 5** | Uses Medusa's default local file provider (files in the backend's `static/` folder). Railway's disk is reset on each deploy, so staging images are temporary. The storefront shows placeholders when a product has no image. Cloudflare R2 + CDN is set up in Phase 5. |
 | 11 Nov 2026 | **Brands** | A `brand` module linked to products (one brand per product). Demo brand names are invented. |
+| 18 Nov 2026 | **Phase 2 performance deferred to Phase 5** | Lighthouse performance on category (76), product (67) and car (67) pages is below the 90 target, mainly JavaScript start-up. The owner signed off Phase 2 and moved the fix to Build Phase 5, task 2 (profile first). |
 | 11 Nov 2026 | **Search: Postgres, not Meilisearch** | Medusa 2.22's search module with its default Postgres provider meets the Phase 2 search tests (typos, synonyms, fits-my-car filter), so no Meilisearch service is needed. See [`adr/0004-search-postgres.md`](adr/0004-search-postgres.md). |
 
 ---
@@ -979,7 +980,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 **Tasks**
 1. Security: OWASP ZAP baseline scan, dependency audit, security headers/CSP, rate limits verified, secrets rotated for production, admin IP/2FA review, a `/security-review` pass on the full codebase.
-2. Performance: Lighthouse CI on the top 10 pages, image audit, caching review; **k6 load test** (e.g. 200 concurrent shoppers browsing, 20 checkouts/min).
+2. Performance: bring category, product and car pages to Lighthouse ≥ 90 (deferred from Phase 2; profile the JavaScript start-up first), Lighthouse CI on the top 10 pages, image audit, caching review; **k6 load test** (e.g. 200 concurrent shoppers browsing, 20 checkouts/min).
 3. Accessibility: full WCAG 2.1 AA audit (automated + manual screen-reader pass with Android TalkBack and NVDA).
 4. Legal & content pages: Privacy (DPDP), Terms, Shipping, Returns/Refunds, Grievance Officer, Contact; cookie/consent banner for analytics.
 5. Analytics & SEO: PostHog funnels, GA4, Search Console, Merchant Center, sitemap submitted.

@@ -22,6 +22,10 @@
 
 > Phase 2 runs on staging since 12 Nov 2026: the Railway backend is deployed from this branch with the demo catalogue loaded, and the pull request's Vercel preview (linked from the PR) uses it. The main storefront URL shows Phase 2 only after the merge to `main`.
 
+## Sign-off
+
+✅ Owner ran the manual test on the pull request preview and signed off Phase 2 on 18 Nov 2026. Tagged `v0.3.0`.
+
 ## Automated results (12 Nov 2026)
 
 | Check                               | Result                                                                                                                                                                                                                            |
@@ -77,6 +81,6 @@ Use your phone for A–D and a laptop for E.
 
 ## Open items
 
-- **Performance below target on category, product and car pages.** The main cost is JavaScript start-up (about 1.2 s of script time on a throttled phone). Not yet profiled: a likely candidate is the full car list that the shop layout sends to every page for the selector. Decide whether to do this now or in Phase 5.
+- **Performance below target on category, product and car pages.** The main cost is JavaScript start-up (about 1.2 s of script time on a throttled phone). Not yet profiled: a likely candidate is the full car list that the shop layout sends to every page for the selector. **Deferred to Phase 5** (owner decision, 18 Nov 2026).
 - **Shiprocket:** swap the mock for the real API, with caching, once credentials exist.
 - **Product photos** use placeholders until Phase 5 (Cloudflare R2).
