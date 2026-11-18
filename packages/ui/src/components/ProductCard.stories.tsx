@@ -29,6 +29,7 @@ type Story = StoryObj<typeof meta>
 export const Fits: Story = {}
 export const DoesNotFit: Story = { args: { fit: { status: "no-fit", car: "Creta" } } }
 export const CheckFitment: Story = { args: { fit: { status: "unknown" } } }
+export const FitsAllCars: Story = { args: { fit: { status: "universal" } } }
 export const NoDiscount: Story = {
   args: { mrp: undefined, title: "3D Fabric Seat Covers with lumbar support" },
 }

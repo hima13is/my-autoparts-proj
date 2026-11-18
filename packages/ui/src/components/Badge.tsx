@@ -40,7 +40,8 @@ export function Badge({ tone = "neutral", icon, children, className }: BadgeProp
   )
 }
 
-export type FitStatus = "fits" | "no-fit" | "unknown"
+/** "universal": fits every car (e.g. a dashcam), so no car is needed to promise fit. */
+export type FitStatus = "fits" | "universal" | "no-fit" | "unknown"
 
 export interface FitBadgeProps {
   status: FitStatus
@@ -55,6 +56,13 @@ export function FitBadge({ status, car, className }: FitBadgeProps) {
     return (
       <Badge tone="fits" icon={<CircleCheck />} className={className}>
         Fits {car ?? "your car"}
+      </Badge>
+    )
+  }
+  if (status === "universal") {
+    return (
+      <Badge tone="fits" icon={<CircleCheck />} className={className}>
+        Fits all cars
       </Badge>
     )
   }

@@ -98,6 +98,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Migrate + seed database
         run: pnpm db:migrate
+      - name: Load demo catalogue (CI database only)
+        working-directory: apps/backend
+        env:
+          ALLOW_DEMO_DATA: "true"
+        run: pnpm exec medusa exec ./src/scripts/seed-demo-catalogue.ts
+      - name: Give the storefront the seeded publishable key
+        run: |
+          KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type = 'publishable' and revoked_at is null and deleted_at is null order by created_at limit 1")
+          test -n "$KEY"
+          echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$KEY" >> "$GITHUB_ENV"
       - name: Start backend
         working-directory: apps/backend
         run: |

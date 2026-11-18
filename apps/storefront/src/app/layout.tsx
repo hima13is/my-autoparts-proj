@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, IBM_Plex_Mono, Noto_Sans } from "next/font/google"
+import { siteUrl } from "@/lib/seo"
 import "./globals.css"
 
 const heading = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"] })
@@ -11,6 +12,8 @@ const mono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
+  // Makes the relative canonical URLs on each page absolute.
+  metadataBase: new URL(siteUrl()),
   title: "FitGaadi: car accessories that fit your car",
   description:
     "Car and SUV accessories for India, matched to your exact car. Sahi fit. Seedha ghar.",

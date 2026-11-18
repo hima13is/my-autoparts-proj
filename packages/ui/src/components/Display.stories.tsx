@@ -20,6 +20,7 @@ export const Badges: Story = {
     <div className="flex flex-wrap gap-2">
       <FitBadge status="fits" car="Creta" />
       <FitBadge status="no-fit" car="Creta" />
+      <FitBadge status="universal" />
       <FitBadge status="unknown" />
       <Badge tone="offer" icon={<Tag />}>
         42% off
