@@ -23,6 +23,7 @@
 | 11 Nov 2026 | **Brands** | A `brand` module linked to products (one brand per product). Demo brand names are invented. |
 | 18 Nov 2026 | **Phase 2 performance deferred to Phase 5** | Lighthouse performance on category (76), product (67) and car (67) pages is below the 90 target, mainly JavaScript start-up. The owner signed off Phase 2 and moved the fix to Build Phase 5, task 2 (profile first). |
 | 11 Nov 2026 | **Search: Postgres, not Meilisearch** | Medusa 2.22's search module with its default Postgres provider meets the Phase 2 search tests (typos, synonyms, fits-my-car filter), so no Meilisearch service is needed. See [`adr/0004-search-postgres.md`](adr/0004-search-postgres.md). |
+| 19 Nov 2026 | **Railway: Infrastructure as Code** | `railway.json` (deprecated Config as Code) is replaced by `.railway/railway.ts` (Railway SDK `railway` 3.16.0, a root dev dependency). It manages only the `backend` service; Postgres and variables stay managed in Railway. Preview changes with `railway config plan`, apply with `railway config apply`. |
 
 ---
 
